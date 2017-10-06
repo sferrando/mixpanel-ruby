@@ -14,7 +14,7 @@ spec = Gem::Specification.new do |spec|
 
   spec.required_ruby_version = '>= 2.4.1'
 
-  spec.add_development_dependency 'activesupport', '~> 4.0'
+  spec.add_development_dependency 'activesupport', '~> 4.2.7.1'
   spec.add_development_dependency 'rake', '~> 0'
   spec.add_development_dependency 'rspec', '~> 3.0'
   spec.add_development_dependency 'webmock', '~> 1.18'
