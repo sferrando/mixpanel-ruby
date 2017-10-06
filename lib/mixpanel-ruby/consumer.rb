@@ -53,12 +53,11 @@ module Mixpanel
   # Mixpanel::Consumer is the default consumer. It sends each message,
   # as the message is recieved, directly to Mixpanel.
   class Consumer
-
     # Create a Mixpanel::Consumer. If you provide endpoint arguments,
     # they will be used instead of the default Mixpanel endpoints.
     # This can be useful for proxying, debugging, or if you prefer
     # not to use SSL for your events.
-    def initialize(events_endpoint=nil, update_endpoint=nil, import_endpoint=nil)
+    def initialize(events_endpoint = nil, update_endpoint = nil, import_endpoint = nil)
       @events_endpoint = events_endpoint || 'https://api.mixpanel.com/track'
       @update_endpoint = update_endpoint || 'https://api.mixpanel.com/engage'
       @import_endpoint = import_endpoint || 'https://api.mixpanel.com/import'
@@ -73,17 +72,17 @@ module Mixpanel
     def send!(type, message)
       type = type.to_sym
       endpoint = {
-        :event => @events_endpoint,
-        :profile_update => @update_endpoint,
-        :import => @import_endpoint,
+        event: @events_endpoint,
+        profile_update: @update_endpoint,
+        import: @import_endpoint
       }[type]
 
-      decoded_message = JSON.load(message)
-      api_key = decoded_message["api_key"]
-      data = Base64.encode64(decoded_message["data"].to_json).gsub("\n", '')
+      decoded_message = JSON.parse(message)
+      api_key = decoded_message['api_key']
+      data = Base64.encode64(decoded_message['data'].to_json).gsub("\n", '')
 
-      form_data = {"data" => data, "verbose" => 1}
-      form_data.merge!("api_key" => api_key) if api_key
+      form_data = { 'data' => data, 'verbose' => 1 }
+      form_data['api_key'] = api_key if api_key
 
       begin
         response_code, response_body = request(endpoint, form_data)
@@ -177,11 +176,11 @@ module Mixpanel
     # to the Mixpanel::Tracker constructor. If a block is passed to
     # the constructor, the *_endpoint constructor arguments are
     # ignored.
-    def initialize(events_endpoint=nil, update_endpoint=nil, import_endpoint=nil, max_buffer_length=MAX_LENGTH, &block)
+    def initialize(events_endpoint = nil, update_endpoint = nil, import_endpoint = nil, max_buffer_length = MAX_LENGTH, &block)
       @max_length = [max_buffer_length, MAX_LENGTH].min
       @buffers = {
-        :event => [],
-        :profile_update => [],
+        event: [],
+        profile_update: []
       }
 
       if block
@@ -209,12 +208,6 @@ module Mixpanel
       end
     end
 
-    # This method was deprecated in release 2.0.0, please use send! instead
-    def send(type, message)
-        warn '[DEPRECATION] send has been deprecated as of release 2.0.0, please use send! instead'
-        send!(type, message)
-    end
-
     # Pushes all remaining messages in the buffer to Mixpanel.
     # You should call #flush before your application exits or
     # messages may not be sent.
@@ -226,8 +219,8 @@ module Mixpanel
 
     def flush_type(type)
       @buffers[type].each_slice(@max_length) do |chunk|
-        data = chunk.map {|message| JSON.load(message)['data'] }
-        @sink.call(type, {'data' => data}.to_json)
+        data = chunk.map { |message| JSON.load(message)['data'] }
+        @sink.call(type, { 'data' => data }.to_json)
       end
       @buffers[type] = []
     end

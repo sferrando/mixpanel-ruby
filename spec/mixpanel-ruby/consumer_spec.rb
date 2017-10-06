@@ -43,7 +43,7 @@ describe Mixpanel::Consumer do
 
     it 'should still respond to send' do
       stub_request(:any, 'https://api.mixpanel.com/track').to_return({:body => '{"status": 1, "error": null}'})
-      subject.send(:event, {'data' => 'TEST EVENT MESSAGE'}.to_json)
+      subject.send!(:event, { 'data' => 'TEST EVENT MESSAGE' }.to_json)
       expect(WebMock).to have_requested(:post, 'https://api.mixpanel.com/track').
         with(:body => {'data' => 'IlRFU1QgRVZFTlQgTUVTU0FHRSI=', 'verbose' => '1' })
     end
@@ -109,7 +109,7 @@ describe Mixpanel::BufferedConsumer do
 
     it 'should still respond to send' do
       stub_request(:any, 'https://api.mixpanel.com/track').to_return({:body => '{"status": 1, "error": null}'})
-      subject.send(:event, {'data' => 'TEST EVENT 1'}.to_json)
+      subject.send!(:event, { 'data' => 'TEST EVENT 1' }.to_json)
       expect(WebMock).to have_not_requested(:post, 'https://api.mixpanel.com/track')
     end
 
