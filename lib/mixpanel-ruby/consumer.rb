@@ -73,17 +73,17 @@ module Mixpanel
     def send!(type, message)
       type = type.to_sym
       endpoint = {
-        :event => @events_endpoint,
-        :profile_update => @update_endpoint,
-        :import => @import_endpoint,
+        event: @events_endpoint,
+        profile_update: @update_endpoint,
+        import: @import_endpoint
       }[type]
 
       decoded_message = JSON.load(message)
-      api_key = decoded_message["api_key"]
+      api_key = decoded_message['api_key']
       data = Base64.encode64(decoded_message["data"].to_json).gsub("\n", '')
 
-      form_data = {"data" => data, "verbose" => 1}
-      form_data.merge!("api_key" => api_key) if api_key
+      form_data = { 'data' => data, 'verbose' => 1 }
+      form_data.merge!('api_key' => api_key) if api_key
 
       begin
         response_code, response_body = request(endpoint, form_data)
@@ -177,11 +177,11 @@ module Mixpanel
     # to the Mixpanel::Tracker constructor. If a block is passed to
     # the constructor, the *_endpoint constructor arguments are
     # ignored.
-    def initialize(events_endpoint=nil, update_endpoint=nil, import_endpoint=nil, max_buffer_length=MAX_LENGTH, &block)
+    def initialize(events_endpoint = nil, update_endpoint = nil, import_endpoint = nil, max_buffer_length = MAX_LENGTH, &block)
       @max_length = [max_buffer_length, MAX_LENGTH].min
       @buffers = {
-        :event => [],
-        :profile_update => [],
+        event: [],
+        profile_update: []
       }
 
       if block
@@ -220,8 +220,8 @@ module Mixpanel
 
     def flush_type(type)
       @buffers[type].each_slice(@max_length) do |chunk|
-        data = chunk.map {|message| JSON.load(message)['data'] }
-        @sink.call(type, {'data' => data}.to_json)
+        data = chunk.map { |message| JSON.load(message)['data'] }
+        @sink.call(type, { 'data' => data }.to_json)
       end
       @buffers[type] = []
     end
