@@ -53,12 +53,11 @@ module Mixpanel
   # Mixpanel::Consumer is the default consumer. It sends each message,
   # as the message is recieved, directly to Mixpanel.
   class Consumer
-
     # Create a Mixpanel::Consumer. If you provide endpoint arguments,
     # they will be used instead of the default Mixpanel endpoints.
     # This can be useful for proxying, debugging, or if you prefer
     # not to use SSL for your events.
-    def initialize(events_endpoint=nil, update_endpoint=nil, import_endpoint=nil)
+    def initialize(events_endpoint = nil, update_endpoint = nil, import_endpoint = nil)
       @events_endpoint = events_endpoint || 'https://api.mixpanel.com/track'
       @update_endpoint = update_endpoint || 'https://api.mixpanel.com/engage'
       @import_endpoint = import_endpoint || 'https://api.mixpanel.com/import'
@@ -78,12 +77,12 @@ module Mixpanel
         import: @import_endpoint
       }[type]
 
-      decoded_message = JSON.load(message)
+      decoded_message = JSON.parse(message)
       api_key = decoded_message['api_key']
-      data = Base64.encode64(decoded_message["data"].to_json).gsub("\n", '')
+      data = Base64.encode64(decoded_message['data'].to_json).gsub("\n", '')
 
       form_data = { 'data' => data, 'verbose' => 1 }
-      form_data.merge!('api_key' => api_key) if api_key
+      form_data['api_key'] = api_key if api_key
 
       begin
         response_code, response_body = request(endpoint, form_data)
